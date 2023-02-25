@@ -1,27 +1,30 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: sealed-secrets
+  name: ingress-nginx
   namespace: argocd
 spec:
   generators:
     - clusters: {}
   template:
     metadata:
-      name: "sealed-secrets-{{name}}"
+      name: "ingress-nginx-{{name}}"
       labels:
         environment: prd
     spec:
       project: default
       source:
         helm:
-          releaseName: sealed-secrets
-        repoURL: https://bitnami-labs.github.io/sealed-secrets
-        chart: sealed-secrets
-        targetRevision: 2.7.2
+          releaseName: "nginx"
+          valueFiles:
+            - "values.yml"
+            - "values-{{name}}.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-ingress-nginx
+        targetRevision: HEAD
       destination:
         server: "{{server}}"
-        namespace: kube-system
+        namespace: ingress-nginx
       syncPolicy:
         syncOptions:
           - CreateNamespace=true

@@ -1,27 +1,28 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: sealed-secrets
+  name: prom-crd
   namespace: argocd
 spec:
   generators:
     - clusters: {}
   template:
     metadata:
-      name: "sealed-secrets-{{name}}"
+      name: "prom-crd-{{name}}"
       labels:
         environment: prd
     spec:
       project: default
       source:
-        helm:
-          releaseName: sealed-secrets
-        repoURL: https://bitnami-labs.github.io/sealed-secrets
-        chart: sealed-secrets
-        targetRevision: 2.7.2
+        repoURL: https://github.com/prometheus-community/helm-charts.git
+        path: charts/kube-prometheus-stack/crds/
+        targetRevision: kube-prometheus-stack-43.1.4
+        directory:
+          recurse: true
       destination:
         server: "{{server}}"
-        namespace: kube-system
+        namespace: monitoring
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
+          - Replace=true

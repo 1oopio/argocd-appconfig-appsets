@@ -1,27 +1,30 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: sealed-secrets
+  name: cert-manager
   namespace: argocd
 spec:
   generators:
     - clusters: {}
   template:
     metadata:
-      name: "sealed-secrets-{{name}}"
+      name: "cert-manager-{{name}}"
       labels:
         environment: prd
     spec:
       project: default
       source:
         helm:
-          releaseName: sealed-secrets
-        repoURL: https://bitnami-labs.github.io/sealed-secrets
-        chart: sealed-secrets
-        targetRevision: 2.7.2
+          releaseName: "cert"
+          valueFiles:
+            - "values.yml"
+            - "values-{{name}}.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-cert-manager
+        targetRevision: HEAD
       destination:
         server: "{{server}}"
-        namespace: kube-system
+        namespace: cert-manager
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
