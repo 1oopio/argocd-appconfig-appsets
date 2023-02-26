@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: ingress-nginx-mgmt-public
+  namespace: argocd
+spec:
+  generators:
+    - clusters: {}
+  template:
+    metadata:
+      name: "ingress-nginx-mgmt-public-{{name}}"
+      labels:
+        environment: prd
+    spec:
+      project: default
+      source:
+        helm:
+          releaseName: "nginx-mgmt-public"
+          valueFiles:
+            - "values.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-ingress-nginx-mgmt-public
+        targetRevision: HEAD
+      destination:
+        server: "{{server}}"
+        namespace: ingress-nginx-mgmt-public
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
