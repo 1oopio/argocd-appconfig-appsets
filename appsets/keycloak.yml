@@ -8,10 +8,10 @@ spec:
   - list:
       elements:
       - cluster: prd-sbg5-1
-        url: https://kubernetes.default.svc    
+        url: https://kubernetes.default.svc
   template:
     metadata:
-      name: "keycloak-{{name}}"
+      name: "keycloak-{{cluster}}"
       labels:
         environment: prd
     spec:
@@ -25,7 +25,7 @@ spec:
         repoURL: git@github.com:1oopio/argocd-appset-keycloak
         targetRevision: HEAD
       destination:
-        server: "{{server}}"
+        server: "{{cluster}}"
         namespace: keycloak
       syncPolicy:
         syncOptions:
