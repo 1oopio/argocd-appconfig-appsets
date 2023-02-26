@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: keycloak
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: prd-sbg5-1
+        url: https://kubernetes.default.svc    
+  template:
+    metadata:
+      name: "keycloak-{{name}}"
+      labels:
+        environment: prd
+    spec:
+      project: default
+      source:
+        helm:
+          releaseName: "keycloak"
+          valueFiles:
+            - "values.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-keycloak
+        targetRevision: HEAD
+      destination:
+        server: "{{server}}"
+        namespace: keycloak
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
