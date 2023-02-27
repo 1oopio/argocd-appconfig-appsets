@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: oauth2-proxy
+  namespace: argocd
+spec:
+  generators:
+    - clusters: {}
+  template:
+    metadata:
+      name: "oauth2-proxy-{{name}}"
+      labels:
+        environment: prd
+    spec:
+      project: default
+      source:
+        helm:
+          releaseName: "oauth2-proxy"
+          valueFiles:
+            - "values.yml"
+            - "values-{{name}}.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-oauth2-proxy
+        targetRevision: HEAD
+      destination:
+        server: "{{server}}"
+        namespace: oauth2-proxy
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
