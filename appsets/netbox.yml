@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: netbox
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            mgmt-cluster: "true"
+  template:
+    metadata:
+      name: "netbox-{{name}}"
+      labels:
+        environment: prd
+    spec:
+      project: default
+      source:
+        helm:
+          releaseName: "netbox"
+          valueFiles:
+            - "values.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-netbox
+        targetRevision: HEAD
+      destination:
+        server: "{{server}}"
+        namespace: netbox
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
