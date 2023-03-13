@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: phantomias-dev
+  namespace: argocd
+spec:
+  generators:
+    - matrix:
+        generators:
+          - clusters: {}
+  template:
+    metadata:
+      name: "{{poolname}}-{{name}}"
+      labels:
+        environment: prod
+    spec:
+      project: default
+      source:
+        helm:
+          releaseName: "{{poolname}}"
+          valueFiles:
+            - "values.yml"
+            - "values-{{name}}.yml"
+        path: ./
+        repoURL: git@github.com:1oopio/argocd-appset-phantomias-dev
+        targetRevision: HEAD
+      destination:
+        server: "{{server}}"
+        namespace: miningcore-dev
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
